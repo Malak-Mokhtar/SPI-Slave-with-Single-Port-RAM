@@ -85,22 +85,20 @@ module SPI_Slave (
 
     // Output logic
     always @(posedge clk) begin
-        if (cs == IDLE)
-            begin
-                counter <= 0;
-                rx_valid <= 0;
-                read_operation <= 0;
-                tx_valid_tmp <= 0;
-            end
-        else if (rx_valid && (counter == 10)) // to raise rx_valid only for 1 clk cycle when it is valid, and to zero the counter in case of READ_DATA after rx_valid has been raised
-                begin
-                    rx_valid <= 0;
-                    counter <= 0;
-                end
-        else if (counter == 10) begin
-                rx_valid <= 1;
+        if (cs == IDLE) begin
+            counter <= 0;
+            rx_valid <= 0;
+            read_operation <= 0;
+            tx_valid_tmp <= 0;
         end
-        // Output on MISO if stored tx_valid is 1 and increment counter (since it has been zeroed) till tx_data is converted into serial out data on MISO port
+        // to raise rx_valid only for 1 clk cycle when it is valid, and to zero the counter in case of READ_DATA after rx_valid has been raised:
+        else if (rx_valid && (counter == 10)) begin
+            rx_valid <= 0;
+            counter <= 0;
+        end
+        else if (counter == 10)
+                rx_valid <= 1;
+        // Output on MISO if stored tx_valid is 1 and increment counter (since it has been zeroed) till tx_data is converted into serial out data on MISO port:
         else if (tx_valid_tmp) begin
             MISO <= tmp_reg[7-counter];
             counter <= counter + 1;
@@ -112,9 +110,8 @@ module SPI_Slave (
         end
 
         // Shift register for the data to be sent from slave side
-        if(SS_n == 0) begin
+        if(SS_n == 0)
             rx_data <= {rx_data[8:0],MOSI};
-        end
         
         // Store tx_valid bit and output on MISO the most significant bit of tx_data received from RAM
         if(tx_valid && (cs == READ_DATA) && (counter == 0)) begin
