@@ -29,15 +29,19 @@ module SPI_Slave (
     reg [7:0] tmp_reg; // to store data returned from RAM
     reg [1:0] read_operation; // 00: Write      01,11: Read
     reg tx_valid_tmp;
+    // Is raised when the master has made the first read address operation. To ensure that we go to IDLE state in case master has NEVER made a Read address operation and wants to do a Read data operation
+    reg read_address_provided;
 
-    //
-    RAM dut (.din(rx_data),.clk(clk),.rst_n(rst_n),.rx_valid(rx_valid),.dout(tx_data),.tx_valid(tx_valid));
+    // RAM instantiation
+    RAM my_ram (.din(rx_data),.clk(clk),.rst_n(rst_n),.rx_valid(rx_valid),.dout(tx_data),.tx_valid(tx_valid));
 
 
     // State memory
     always @(posedge clk or negedge rst_n) begin
-        if(!rst_n)
+        if(!rst_n) begin
             cs <= IDLE;
+            read_address_provided <= 0;
+        end
         else
             cs <= ns;
     end
@@ -69,14 +73,16 @@ module SPI_Slave (
                     0 : ns = WRITE; 
                     default: ns = IDLE;
                 endcase
-            READ_ADD:
+            READ_ADD: begin
                 case (SS_n)
                     0 : ns = READ_ADD; 
                     default: ns = IDLE;
                 endcase
+                read_address_provided <= 1;
+            end
             READ_DATA:
-                case (SS_n)
-                    0 : ns = READ_DATA; 
+                case ({SS_n,read_address_provided}) // if Master had not provided a Read address before, then return to IDLE state
+                    2'b01 : ns = READ_DATA; 
                     default: ns = IDLE;
                 endcase
             default: ns = IDLE;
