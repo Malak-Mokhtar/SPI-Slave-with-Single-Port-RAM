@@ -33,9 +33,6 @@ module SPI_Slave (
     // Is raised when the master has made the first read address operation. To ensure that we go to IDLE state in case master has NEVER made a Read address operation and wants to do a Read data operation
     reg read_address_provided;
 
-    // RAM instantiation
-    RAM my_ram (.din(rx_data),.clk(clk),.rst_n(rst_n),.rx_valid(rx_valid),.dout(tx_data),.tx_valid(tx_valid));
-
 
     // State memory
     always @(posedge clk or negedge rst_n) begin

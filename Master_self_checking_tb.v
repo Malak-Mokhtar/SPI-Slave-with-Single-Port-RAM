@@ -21,8 +21,8 @@ module Master_self_checking_tb ();
     reg [7:0] write_data_expected;
 
     // DUT instantiation
-    SPI_Slave #(.IDLE(IDLE),.CHK_CMD(CHK_CMD),.WRITE(WRITE),.READ_ADD(READ_ADD),.READ_DATA(READ_DATA))
-                dut (.clk(clk),.rst_n(rst_n),.MOSI(MOSI),.MISO(MISO_dut),.SS_n(SS_n),.rx_data(),.rx_valid(),.tx_data(),.tx_valid());
+    SPI_Wrapper #(.IDLE(IDLE),.CHK_CMD(CHK_CMD),.WRITE(WRITE),.READ_ADD(READ_ADD),.READ_DATA(READ_DATA))
+                dut (.clk(clk),.rst_n(rst_n),.MOSI(MOSI),.MISO(MISO_dut),.SS_n(SS_n));
 
     initial begin
         clk = 0;
