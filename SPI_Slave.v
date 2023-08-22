@@ -36,9 +36,8 @@ module SPI_Slave (
 
     // State memory
     always @(posedge clk or negedge rst_n) begin
-        if(!rst_n) begin
+        if(!rst_n)
             cs <= IDLE;
-        end
         else
             cs <= ns;
     end
