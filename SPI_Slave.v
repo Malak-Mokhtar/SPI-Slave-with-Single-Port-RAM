@@ -23,7 +23,7 @@ module SPI_Slave (
     input [7:0] tx_data; // Data received from RAM
     input tx_valid;
 
-    (* fsm_encoding = "sequential" *)
+    (* fsm_encoding = "gray" *)
     reg [2:0] cs,ns;
 
     reg [3:0] counter; // 4-bit counter for serial to parallel and vice versa conversions
