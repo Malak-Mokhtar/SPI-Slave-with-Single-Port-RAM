@@ -1,0 +1,6 @@
+vlib work
+vlog SPI_Wrapper.v Master_tb.v
+vsim -voptargs=+acc work.Master_tb
+add wave *
+run -all
+#quit -sim
