@@ -38,7 +38,6 @@ module SPI_Slave (
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
             cs <= IDLE;
-            read_address_provided <= 0;
         end
         else
             cs <= ns;
@@ -49,10 +48,7 @@ module SPI_Slave (
         case (cs)
             IDLE:
                 case (SS_n)
-                    0 : begin
-                        ns = CHK_CMD;
-                        read_operation = 00;
-                    end
+                    0 : ns = CHK_CMD;
                     default: ns = IDLE;
                 endcase
             CHK_CMD:
@@ -71,13 +67,11 @@ module SPI_Slave (
                     0 : ns = WRITE; 
                     default: ns = IDLE;
                 endcase
-            READ_ADD: begin
+            READ_ADD:
                 case (SS_n)
                     0 : ns = READ_ADD; 
                     default: ns = IDLE;
                 endcase
-                read_address_provided <= 1;
-            end
             READ_DATA:
                 case ({SS_n,read_address_provided}) // if Master had not provided a Read address before, then return to IDLE state
                     2'b01 : ns = READ_DATA; 
@@ -130,4 +124,10 @@ module SPI_Slave (
 
     end
 
+    always @(posedge clk or negedge rst_n) begin
+        if(!rst_n)
+            read_address_provided <= 0;
+        else if(cs == READ_ADD)
+            read_address_provided <= 1;
+    end
 endmodule
